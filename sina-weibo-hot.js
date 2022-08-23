@@ -117,6 +117,7 @@ function provideBatteryIcon() {
   return draw.getImage()
 }
 const API_ENDPOINT = "https://m.weibo.cn/api/container/getIndex?containerid=106003type%3D25%26t%3D3%26disable_hot%3D1%26filter_type%3Drealtimehot"
+const API_FUN_ENDPOINT = "https://m.weibo.cn/api/container/getIndex?containerid=106003type%3D25%26t%3D3%26disable_hot%3D1%26filter_type%3Dfun"
 
 /**
  * Description: 新浪微博热搜
@@ -143,10 +144,12 @@ function weiboIconRenderer(url) {
 
 async function createWidget(items) {
   let item = items[0].card_group
+  const exceptions = await loadExceptions(1000000)
   const list = item.filter((i, idx) => {
     if (
       !i.promotion// 非推广热搜
-      && !(i.desc_extr && typeof i.desc_extr === "string" && ["剧集", "综艺", "盛典", "音乐"].includes(i.desc_extr.split(" ")[0])) // 非“剧集”、“综艺”类型热搜
+      && !(i.desc_extr && typeof i.desc_extr === "string" && ["剧集", "综艺", "盛典"].includes(i.desc_extr.split(" ")[0])) // 非“剧集”、“综艺”类型热搜
+      && !exceptions.includes(i.desc) // 或者从文娱榜里剔除了阅读量 < 100w的
     ) {
       return i
     }
@@ -171,7 +174,7 @@ async function createWidget(items) {
   battery(w, '微博热搜')
   w.addSpacer(5)
   list.forEach((i, idx) => {
-    if (idx < 19) {
+    if (idx < 18) {
       const titleTxt = w.addText("· " + weiboIconRenderer(i.icon) + i.desc)
       titleTxt.font = Font.boldSystemFont(14)
       titleTxt.textColor = Color.white()
@@ -192,4 +195,18 @@ async function loadItems() {
   })
   let json = await req.loadJSON()
   return json.data.cards
+}
+async function loadExceptions(keepNum) {
+  let exceptReq = await new Request(API_FUN_ENDPOINT, {
+    headers: {
+      "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36"
+    }
+  })
+  let json = await exceptReq.loadJSON()
+  return json.data.cards.map(card => {
+    if(typeof card.desc_extr === "string") card.desc_extr = parseInt(card.desc_extr.split(" ")[1])
+    if(card.desc_extr === NaN) card.desc_extr = 0;
+    if(card.desc_extr < keepNum) return card.desc;
+    return ""
+  })
 }
