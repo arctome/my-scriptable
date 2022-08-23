@@ -146,7 +146,7 @@ async function createWidget(items) {
   const list = item.filter((i, idx) => {
     if (
       !i.promotion// 非推广热搜
-      && !(i.desc_extr && typeof i.desc_extr === "string" && ["剧集", "综艺", "盛典"].includes(i.desc_extr.split(" ")[0])) // 非“剧集”、“综艺”类型热搜
+      && !(i.desc_extr && typeof i.desc_extr === "string" && ["剧集", "综艺", "盛典", "音乐"].includes(i.desc_extr.split(" ")[0])) // 非“剧集”、“综艺”类型热搜
     ) {
       return i
     }
