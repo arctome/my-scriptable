@@ -194,7 +194,7 @@ async function loadItems() {
     }
   })
   let json = await req.loadJSON()
-  return json.data.cards
+  return (json.data && json.data.cards && Array.isArray(json.data.cards)) ? json.data.cards : []
 }
 async function loadExceptions(keepNum) {
   let exceptReq = await new Request(API_FUN_ENDPOINT, {
