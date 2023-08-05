@@ -143,6 +143,24 @@ function weiboIconRenderer(url) {
 }
 
 async function createWidget(items) {
+  let w = new ListWidget()
+  w.setPadding(-3, 15, 5, 15)
+  w.backgroundGradient = gradient
+  // Add spacer above content to center it vertically.
+  w.addSpacer()
+  // const title = w.addText('微博热搜')
+  // title.font = Font.boldSystemFont(16)
+  // title.textColor = new Color('#f9d423')
+  // title.centerAlignText()
+  battery(w, '微博热搜')
+  w.addSpacer(5)
+  if(!Array.isArray(items) || !items[0] || !items[0].card_group) {
+    // load error
+    const titleTxt = w.addText("x " + "热搜加载失败，请稍后再试...")
+    titleTxt.font = Font.boldSystemFont(14)
+    titleTxt.textColor = Color.white()
+    return;
+  }
   let item = items[0].card_group
   const exceptions = await loadExceptions(1000000)
   const list = item.filter((i, idx) => {
@@ -162,17 +180,6 @@ async function createWidget(items) {
     new Color("#ff5858"),
     new Color("#f09819")
   ]
-  let w = new ListWidget()
-  w.setPadding(-3, 15, 5, 15)
-  w.backgroundGradient = gradient
-  // Add spacer above content to center it vertically.
-  w.addSpacer()
-  // const title = w.addText('微博热搜')
-  // title.font = Font.boldSystemFont(16)
-  // title.textColor = new Color('#f9d423')
-  // title.centerAlignText()
-  battery(w, '微博热搜')
-  w.addSpacer(5)
   list.forEach((i, idx) => {
     if (idx < 18) {
       const titleTxt = w.addText("· " + weiboIconRenderer(i.icon) + i.desc)
