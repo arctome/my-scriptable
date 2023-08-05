@@ -144,6 +144,12 @@ function weiboIconRenderer(url) {
 
 async function createWidget(items) {
   let w = new ListWidget()
+  let gradient = new LinearGradient()
+  gradient.locations = [0, 1]
+  gradient.colors = [
+    new Color("#ff5858"),
+    new Color("#f09819")
+  ]
   w.setPadding(-3, 15, 5, 15)
   w.backgroundGradient = gradient
   // Add spacer above content to center it vertically.
@@ -174,12 +180,6 @@ async function createWidget(items) {
   })
   // 去掉第一个置顶热搜，因为一般是人工设置的，非事件性的
   list.shift()
-  let gradient = new LinearGradient()
-  gradient.locations = [0, 1]
-  gradient.colors = [
-    new Color("#ff5858"),
-    new Color("#f09819")
-  ]
   list.forEach((i, idx) => {
     if (idx < 18) {
       const titleTxt = w.addText("· " + weiboIconRenderer(i.icon) + i.desc)
